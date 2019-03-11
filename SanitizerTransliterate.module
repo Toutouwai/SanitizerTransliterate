@@ -39,6 +39,11 @@ class SanitizerTransliterate extends WireData implements Module, ConfigurableMod
 	 */
 	public function ready() {
 		$this->addHookMethod('Sanitizer::transliterate', $this, 'transliterate');
+		$this->addHookAfter("Sanitizer::getAll", function($event) {
+			$sanitizers = $event->return;
+			$sanitizers[] = 'transliterate';
+			$event->return = $sanitizers;
+		});
 	}
 
 	/**
