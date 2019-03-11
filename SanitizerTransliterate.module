@@ -1,0 +1,327 @@
+<?php namespace ProcessWire;
+
+/**
+ *
+ * Sanitizer Transliterate
+ * Based largely on InputfieldPageName
+ *
+ * @author Robin Sallis
+ *
+ * ProcessWire 3.x
+ * Copyright (C) 2011 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ *
+ */
+
+class SanitizerTransliterate extends WireData implements Module, ConfigurableModule {
+
+	/**
+	 * Module information
+	 */
+	public static function getModuleInfo() {
+		return array(
+			'title' => 'Sanitizer Transliterate',
+			'summary' => 'Adds a transliterate method to $sanitizer that performs character substitutions as defined in the module config.',
+			'version' => '0.1.0',
+			'author' => 'Robin Sallis',
+			'href' => 'https://github.com/Toutouwai/SanitizerTransliterate',
+			'icon' => 'exchange',
+			'autoload' => true,
+			'requires' => 'ProcessWire>=3.0.16',
+		);
+	}
+
+	/**
+	 * Ready
+	 */
+	public function ready() {
+		$this->addHookMethod('Sanitizer::transliterate', $this, 'transliterate');
+	}
+
+	/**
+	 * Transliterate text
+	 *
+	 * @param HookEvent $event
+	 */
+	protected function transliterate(HookEvent $event) {
+		$value = $event->arguments(0);
+		foreach($this->character_replacements as $from => $to) {
+			if(mb_strpos($value, $from) !== false) {
+				$value = mb_ereg_replace($from, $to, $value);
+			}
+		}
+		$event->return = $value;
+	}
+
+	/**
+	 * Convert replacement array to string
+	 *
+	 * @param array $a
+	 * @return string
+	 */
+	protected function replacementArrayToString($a) {
+		$str = '';
+		foreach($a as $k => $v) $str .= "$k=$v\n";
+		return rtrim($str);
+	}
+
+	/**
+	 * Convert replacement string to array
+	 *
+	 * @param string $str
+	 * @return array
+	 */
+	protected function replacementStringToArray($str) {
+		$r = preg_split('/[\r\n]+/', $str);
+		$a = array();
+		foreach($r as $key => $value) {
+			if(!strpos($value, '=')) continue;
+			list($k, $v) = explode('=', $value);
+			$a[trim($k)] = trim($v);
+		}
+		return $a;
+	}
+
+	/**
+	 * Get the default config data
+	 *
+	 * @return array
+	 */
+	protected function getDefaultConfigData() {
+		$data = array();
+		$default_replacements = array(
+			'à' => 'a',
+			'À' => 'A',
+			'а' => 'a',
+			'А' => 'A',
+			'â' => 'a',
+			'Â' => 'A',
+			'á' => 'a',
+			'Á' => 'A',
+			'å' => 'a',
+			'Å' => 'A',
+			'ā' => 'a',
+			'Ā' => 'A',
+			'ą' => 'a',
+			'Ą' => 'A',
+			'ã' => 'a',
+			'Ã' => 'A',
+			'ä' => 'a',
+			'Ä' => 'A',
+			'æ' => 'ae',
+			'Æ' => 'Ae',
+			'б' => 'b',
+			'Б' => 'B',
+			'Ç' => 'C',
+			'ć' => 'c',
+			'Ć' => 'C',
+			'č' => 'c',
+			'Č' => 'C',
+			'ç' => 'c',
+			'ч' => 'ch',
+			'Ч' => 'Ch',
+			'д' => 'd',
+			'Д' => 'D',
+			'ď' => 'd',
+			'Ď' => 'D',
+			'đ' => 'dj',
+			'Đ' => 'Dj',
+			'э' => 'e',
+			'Э' => 'E',
+			'ę' => 'e',
+			'Ę' => 'E',
+			'é' => 'e',
+			'É' => 'E',
+			'ë' => 'e',
+			'Ë' => 'E',
+			'ê' => 'e',
+			'Ê' => 'E',
+			'ě' => 'e',
+			'Ě' => 'E',
+			'ē' => 'e',
+			'Ē' => 'E',
+			'е' => 'e',
+			'Е' => 'E',
+			'ё' => 'e',
+			'Ё' => 'E',
+			'è' => 'e',
+			'È' => 'E',
+			'ф' => 'f',
+			'Ф' => 'F',
+			'г' => 'g',
+			'Г' => 'G',
+			'ğ' => 'g',
+			'Ğ' => 'G',
+			'İ' => 'I',
+			'й' => 'i',
+			'Й' => 'I',
+			'и' => 'i',
+			'И' => 'I',
+			'ı' => 'i',
+			'î' => 'i',
+			'Î' => 'I',
+			'ī' => 'i',
+			'Ī' => 'I',
+			'ï' => 'i',
+			'Ï' => 'I',
+			'í' => 'i',
+			'Í' => 'I',
+			'ì' => 'i',
+			'Ì' => 'I',
+			'я' => 'ia',
+			'Я' => 'Ia',
+			'ю' => 'iu',
+			'Ю' => 'Iu',
+			'к' => 'k',
+			'К' => 'K',
+			'х' => 'kh',
+			'Х' => 'Kh',
+			'л' => 'l',
+			'Л' => 'L',
+			'ĺ' => 'l',
+			'Ĺ' => 'L',
+			'ľ' => 'l',
+			'Ľ' => 'L',
+			'ł' => 'l',
+			'Ł' => 'L',
+			'м' => 'm',
+			'М' => 'M',
+			'н' => 'n',
+			'Н' => 'N',
+			'ń' => 'n',
+			'Ń' => 'N',
+			'ñ' => 'n',
+			'Ñ' => 'N',
+			'ň' => 'n',
+			'Ň' => 'N',
+			'ø' => 'o',
+			'Ø' => 'O',
+			'ô' => 'o',
+			'Ô' => 'O',
+			'о' => 'o',
+			'О' => 'O',
+			'ö' => 'o',
+			'Ö' => 'O',
+			'õ' => 'o',
+			'Õ' => 'O',
+			'ò' => 'o',
+			'Ò' => 'O',
+			'ó' => 'o',
+			'Ó' => 'O',
+			'ō' => 'o',
+			'Ō' => 'O',
+			'п' => 'p',
+			'П' => 'P',
+			'ŕ' => 'r',
+			'Ŕ' => 'R',
+			'р' => 'r',
+			'Р' => 'R',
+			'ř' => 'r',
+			'Ř' => 'R',
+			'Ş' => 'S',
+			'š' => 's',
+			'Š' => 'S',
+			'ś' => 's',
+			'Ś' => 'S',
+			'с' => 's',
+			'С' => 'S',
+			'ş' => 's',
+			'ш' => 'sh',
+			'Ш' => 'Sh',
+			'щ' => 'shch',
+			'Щ' => 'Shch',
+			'ß' => 'Ss',
+			'т' => 't',
+			'Т' => 'T',
+			'ť' => 't',
+			'Ť' => 'T',
+			'ц' => 'tc',
+			'Ц' => 'Tc',
+			'у' => 'u',
+			'У' => 'U',
+			'ü' => 'u',
+			'Ü' => 'U',
+			'ů' => 'u',
+			'Ů' => 'U',
+			'û' => 'u',
+			'Û' => 'U',
+			'ú' => 'u',
+			'Ú' => 'U',
+			'ù' => 'u',
+			'Ù' => 'U',
+			'ū' => 'u',
+			'Ū' => 'U',
+			'в' => 'v',
+			'В' => 'V',
+			'ы' => 'y',
+			'Ы' => 'Y',
+			'ý' => 'y',
+			'Ý' => 'Y',
+			'з' => 'z',
+			'З' => 'Z',
+			'ž' => 'z',
+			'Ž' => 'Z',
+			'ż' => 'z',
+			'Ż' => 'Z',
+			'ź' => 'z',
+			'Ź' => 'Z',
+			'ж' => 'zh',
+			'Ж' => 'Zh',
+		);
+		$data['character_replacements'] = $default_replacements;
+		$data['character_replacements_str'] = $this->replacementArrayToString($default_replacements);
+		return $data;
+	}
+
+	/**
+	 * Process the submitted config data
+	 *
+	 * @param HookEvent $event
+	 */
+	protected function beforeConfigSave(HookEvent $event) {
+		if($event->arguments(0) != $this) return;
+		$data = $event->arguments(1);
+		if(empty($data['character_replacements_str'])) {
+			// Set default config data
+			$data = $this->getDefaultConfigData();
+		} else {
+			$data['character_replacements'] = $this->replacementStringToArray($data['character_replacements_str']);
+		}
+		$event->arguments(1, $data);
+	}
+
+	/**
+	 * Config inputfields
+	 *
+	 * @param InputfieldWrapper $inputfields
+	 */
+	public function getModuleConfigInputfields($inputfields) {
+		$modules = $this->wire('modules');
+
+		/* @var InputfieldTextarea $f */
+		$f = $modules->InputfieldTextarea;
+		$f_name = 'character_replacements_str';
+		$f->name = $f_name;
+		$f->label = $this->_('Character replacements');
+		$f->description = $this->_('Enter the replacements that will occur when this sanitizer method is used. Enter one replacement per line in key=value format. Meaning, on each new line, enter the character(s) you want to replace followed by an equals sign "=" and the ascii character(s) you want to replace with.');
+		$f->value = $this->$f_name;
+		$f->rows = 15;
+		$inputfields->add($f);
+
+		// Add hook to process config before save
+		$modules->addHookBefore('saveConfig', $this, 'beforeConfigSave');
+	}
+
+	/**
+	 * Install
+	 */
+	public function install() {
+		// Establish default config data
+		$data = $this->getDefaultConfigData();
+		$this->wire('modules')->saveConfig($this, $data);
+	}
+
+}
