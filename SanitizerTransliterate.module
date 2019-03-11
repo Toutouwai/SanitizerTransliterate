@@ -24,7 +24,7 @@ class SanitizerTransliterate extends WireData implements Module, ConfigurableMod
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Sanitizer Transliterate',
-			'summary' => 'Adds a transliterate method to $sanitizer that performs character substitutions as defined in the module config.',
+			'summary' => 'Adds a transliterate method to $sanitizer that performs character replacements as defined in the module config.',
 			'version' => '0.1.0',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/SanitizerTransliterate',

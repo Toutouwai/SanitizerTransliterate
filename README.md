@@ -1,6 +1,6 @@
 # Sanitizer Transliterate
 
-A module for ProcessWire CMS/CMF. Adds a `transliterate` method to `$sanitizer` that performs character replacements as defined in the module config.
+A module for ProcessWire CMS/CMF. Adds a `transliterate` method to `$sanitizer` that performs character replacements as defined in the module config. The default character replacements are based on the defaults from InputfieldPageName.
 
 ## Usage
 
