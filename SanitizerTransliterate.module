@@ -25,7 +25,7 @@ class SanitizerTransliterate extends WireData implements Module, ConfigurableMod
 		return array(
 			'title' => 'Sanitizer Transliterate',
 			'summary' => 'Adds a transliterate method to $sanitizer that performs character replacements as defined in the module config.',
-			'version' => '0.1.0',
+			'version' => '0.1.1',
 			'author' => 'Robin Sallis',
 			'href' => 'https://github.com/Toutouwai/SanitizerTransliterate',
 			'icon' => 'exchange',
@@ -233,7 +233,8 @@ class SanitizerTransliterate extends WireData implements Module, ConfigurableMod
 			'Ш' => 'Sh',
 			'щ' => 'shch',
 			'Щ' => 'Shch',
-			'ß' => 'Ss',
+			'ẞ' => 'Ss',
+			'ß' => 'ss',
 			'т' => 't',
 			'Т' => 'T',
 			'ť' => 't',
